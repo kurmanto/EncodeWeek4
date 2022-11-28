@@ -1,0 +1,218 @@
+<div class="px-4 py-5 text-center">
+  <h1 class="display-5 fw-bold mb-4">My Ballot Example</h1>
+  <div *ngIf="!wallet" class="col-lg-6 mx-auto">
+    <p>To use this ballot you need to connect a wallet</p>
+    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+      <button
+        (click)="createWallet()"
+        type="button"
+        class="btn btn-primary btn-lg px-4 gap-3"
+      >
+        Create Wallet
+      </button>
+      <button
+        (click)="clickImportButton()"
+        type="button"
+        class="btn btn-primary btn-lg px-4 gap-3"
+        [disabled]="importFlag"
+      >
+        Import Wallet
+      </button>
+      <button type="button" disabled class="btn btn-primary btn-lg px-4 gap-3">
+        Connect Wallet
+      </button>
+    </div>
+    <div *ngIf="importToggle" class="mt-4 mx-5">
+      <div class="d-flex justify-content-around">
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="mnemonicOrPrivateKey"
+            id="mnemonicOrPrivateKey1"
+            (click)="setPrivateOrMnemonic('mnemonic')"
+          />
+          <label class="form-check-label" for="mnemonicOrPrivateKey1">
+            Use Mnemonic
+          </label>
+        </div>
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="mnemonicOrPrivateKey"
+            id="mnemonicOrPrivateKey2"
+            (click)="setPrivateOrMnemonic('private')"
+          />
+          <label class="form-check-label" for="mnemonicOrPrivateKey2">
+            Use Private Key
+          </label>
+        </div>
+      </div>
+      <input
+        #walletAddress
+        class="form-control mt-4"
+        type="text"
+        placeholder="Provide wallet address here"
+      />
+      <input
+        #privateKeyOrMnemonic
+        class="form-control mt-4"
+        type="text"
+        placeholder="Provide Mnemonic phrase or privat key here"
+      />
+      <button
+        type="button"
+        class="btn btn-primary btn-lg px-4 gap-3 mt-4"
+        (click)="importWallet(walletAddress.value, privateKeyOrMnemonic.value)"
+      >
+        Import
+      </button>
+    </div>
+  </div>
+  <div *ngIf="wallet" class="col-lg-8 mx-auto">
+    <p>Wallet (goerli) Address: {{ wallet.address }}</p>
+    <p>Token Contract Address {{ tokenAddress }}</p>
+    <p *ngIf="ballotAddress">Ballot Contract Address {{ ballotAddress }}</p>
+    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mx-auto">
+      <div class="px-1 p-5 mt-4 rounded-5 bg-light col-sm-3">
+        <div class="container-fluid">
+          <p class="fs-6">My ether balance is:</p>
+          <h4>
+            {{ etherBalance }}
+          </h4>
+        </div>
+      </div>
+      <div class="px-1 p-5 mt-4 rounded-5 bg-light col-sm-3">
+        <div class="container-fluid">
+          <p class="fs-6">My token balance is:</p>
+          <h4>
+            {{ tokenBalance }}
+          </h4>
+        </div>
+      </div>
+      <div class="px-1 p-5 mt-4 rounded-5 bg-light col-sm-3">
+        <div class="container-fluid">
+          <p class="fs-64">My voting power is:</p>
+          <h4>
+            {{ votePower }}
+          </h4>
+        </div>
+      </div>
+      <!-- <div class="card">
+        <div class="card-body">My ether balance is: {{ etherBalance }}</div>
+      </div>
+      <div class="card">
+        <div class="card-body">My token balance is: {{ tokenBalance }}</div>
+      </div>
+      <div class="card">
+        <div class="card-body">My voting power is: {{ votePower }}</div>
+      </div> -->
+    </div>
+    <div
+      *ngIf="ballotAddress"
+      class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4 mx-auto"
+    >
+      <div class="px-1 p-5 rounded-5 bg-light col-sm-4">
+        <div class="container-fluid">
+          <p class="fs-6">
+            Winning proposal:
+          </p>
+          <h4>
+            {{ winningIndex + " - " + winnerName }}
+          </h4>
+        </div>
+      </div>
+      <div class="px-1 p-5 rounded-5 bg-light col-sm-4">
+        <div class="container-fluid">
+          <p class="fs-64">Voting target block:</p>
+          <h4>
+            {{ targetBlock }}
+          </h4>
+        </div>
+      </div>
+      <!-- <div class="card">
+        <div class="card-body">Winning proposal: {{ winningIndex + ' - ' + winnerName }}</div>
+      </div>
+      <div class="card">
+        <div class="card-body">Voting target block: {{ targetBlock }}</div>
+      </div> -->
+    </div>
+    <div *ngIf="!ballotAddress" class="d-flex flex-column col-lg-7 mx-auto">
+      <h2 class="my-4">Connect to the ballot here:</h2>
+      <input
+        class="form-control mb-4"
+        #ballotContractAddress
+        type="text"
+        placeholder="Paste contract address here"
+      />
+      <button
+        (click)="connectBallot(ballotContractAddress.value)"
+        type="button"
+        class="btn btn-info btn-lg px-4 gap-3"
+      >
+        Connect Ballot
+      </button>
+    </div>
+    <div *ngIf="ballotConnected" class="d-flex justify-content-center">
+      <div *ngIf="!voted" class="d-flex flex-column col-sm-2 px-1">
+        <p class="my-4">Vote:</p>
+        <input
+          #vote
+          class="form-control mb-2"
+          type="text"
+          placeholder="Vote index here"
+        />
+        <input
+          #voteAmount
+          class="form-control mb-2"
+          type="text"
+          placeholder="Amount"
+        />
+        <button
+          (click)="castVote(vote.value, voteAmount.value)"
+          type="button"
+          class="btn btn-warning btn-lg px-4 gap-3 mt-3"
+        >
+          Vote
+        </button>
+      </div>
+      <div *ngIf="voted" class="px-1 p-5 rounded-3 col-sm-2">
+        <div class="container-fluid py-5">
+          <p class="fs-4">Voted!</p>
+        </div>
+      </div>
+      <div *ngIf="!delegated" class="d-flex flex-column col-sm-5 px-1">
+        <p class="my-4">Delegate to:</p>
+        <input
+          #delegateAddress
+          class="form-control mb-2"
+          type="text"
+          placeholder="'self' / Address"
+        />
+        <button
+          (click)="delegate(delegateAddress.value)"
+          type="button"
+          class="btn btn-warning btn-lg px-4 gap-3 mt-auto"
+        >
+          Delegate
+        </button>
+      </div>
+      <div *ngIf="delegated" class="px-1 p-5 rounded-3 col-sm-5">
+        <div class="container-fluid py-5">
+          <p class="fs-4">Delegated!</p>
+        </div>
+      </div>
+    </div>
+    <div class="d-flex flex-column col-lg-7 mx-auto">
+      <h2 class="my-4">Claim your tokens here:</h2>
+      <button
+        (click)="claimTokens()"
+        type="button"
+        class="btn btn-success btn-lg px-4 gap-3"
+      >
+        Claim Tokens
+      </button>
+    </div>
+  </div>
+</div>
