@@ -140,6 +140,7 @@ export class AppComponent {
     this.http
       .post<any>('http://localhost:3000/claim-tokens', {
         address: this.wallet?.address,
+        amount: 10
       })
       .subscribe((ans) => {
         // const txHash = ans.result;
@@ -205,12 +206,13 @@ export class AppComponent {
       if (this.tokenContract)
         this.tokenContract['delegate'](to).then((ans: any) => {
           console.log(ans);
+          this.delegated = true;
+          this.getBallotInfo();
+          this.updateInfo;
+          !this.delegated;
           return { result: 'success' };
         });
-      this.delegated = true;
-      this.getBallotInfo();
-      this.updateInfo;
-      !this.delegated;
+      
     } catch (error) {
       alert(error);
     }
@@ -224,11 +226,11 @@ export class AppComponent {
       if (this.ballotContract)
         this.ballotContract['vote'](voteId, amount).then((ans: any) => {
           console.log(ans);
+          this.getBallotInfo();
+          this.updateInfo();
+          !this.voted;
           return { result: 'success' };
         });
-      this.getBallotInfo();
-      this.updateInfo();
-      !this.voted;
     } catch (error) {
       alert(error);
     }

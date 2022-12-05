@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+  import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ethers } from 'ethers';
 import { AppService } from './app.service';
 
 export class claimTokenDto {
   address: string;
+  amount: string
 }
 
 export class connectBallotDto {
@@ -31,7 +32,7 @@ export class AppController {
 
   @Post('claim-tokens')
   claimTokens(@Body() body: claimTokenDto) {
-    return this.appService.claimTokens(body.address);
+    return this.appService.claimTokens(body.address, body.amount);
   }
 
   @Post('connect-ballot-contract')

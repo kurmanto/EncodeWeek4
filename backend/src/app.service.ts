@@ -18,8 +18,6 @@ export class AppService {
   mintedAddresses: string[];
   votedAddresses = new Map();
 
-  votesPerUser = ethers.utils.parseEther('1');
-
   constructor(private configService: ConfigService) {
     this.provider = ethers.getDefaultProvider('goerli');
     this.wallet = ethers.Wallet.fromMnemonic(
@@ -33,12 +31,16 @@ export class AppService {
     return { result: TOKENIZED_VOTES_ADDRESS };
   }
 
-  async claimTokens(address: string) {
-    return this.tokenContract['mint'](
+  async claimTokens(address: string, amount: string) {
+    this.tokenContract['mint'](
       address,
-      this.votesPerUser,
+      amount,
     ).then((tx) => {
-      return tx;
+      this.tokenContract['balanceOf'](address).then(
+        (balanceBN: ethers.BigNumberish) => {
+          return parseFloat(ethers.utils.formatEther(balanceBN));
+        }
+      );
     });
     // if (!this.mintedAddresses[address]) {
     //   this.tokenContract['mint'](address, this.votesPerUser).then((tx) => {
